@@ -10,7 +10,23 @@ class TestParser(unittest.TestCase):
         result = parse("select * from blog;")
         expected = {
             'type':'SELECT',
+            'distinct':'N',
             'column':[{'name':'*','func':''}],
+            'table':'blog',
+            'where':[],
+            'group':[],
+            'having':[],
+            'order':[],
+            'limit':[]
+        }
+        self.assertEqual(result,expected)
+
+    def test_distinct(self):
+        result = parse("select distinct name from blog;")
+        expected = {
+            'type':'SELECT',
+            'distinct': 'Y',
+            'column':[{'name':'name','func':''}],
             'table':'blog',
             'where':[],
             'group':[],
@@ -24,6 +40,7 @@ class TestParser(unittest.TestCase):
         result = parse("select * from blog where name='zhangsan';")
         expected = {
             'type':'SELECT',
+            'distinct': 'N',
             'column':[{'name':'*','func':''}],
             'table':'blog',
             'where':[{'left': {'name': 'name', 'func': ''}, 'right': 'zhangsan', 'compare': '='}],
@@ -38,6 +55,7 @@ class TestParser(unittest.TestCase):
         result = parse("select * from blog where name='zhangsan' and (age<18 or age>30);")
         expected = {
             'type':'SELECT',
+            'distinct': 'N',
             'column':[{'name':'*','func':''}],
             'table':'blog',
             'where':
@@ -61,6 +79,7 @@ class TestParser(unittest.TestCase):
         result = parse("select * from blog where name like '%张%';")
         expected = {
             'type':'SELECT',
+            'distinct': 'N',
             'column':[{'name':'*','func':''}],
             'table':'blog',
             'where':
@@ -78,6 +97,7 @@ class TestParser(unittest.TestCase):
         result = parse("select name,age,count(*) from blog group by name,age;")
         expected = {
             'type':'SELECT',
+            'distinct': 'N',
             'column':[{'name':'name','func':''},{'name':'age','func':''},{'name':'*','func':'COUNT'}],
             'table':'blog',
             'where':[],
@@ -92,6 +112,7 @@ class TestParser(unittest.TestCase):
         result = parse("select name,age,count(*),avg(age) from blog group by name,age having count(*)>2 and avg(age)<20;")
         expected = {
             'type':'SELECT',
+            'distinct': 'N',
             'column':[{'name':'name','func':''},
                       {'name':'age','func':''},
                       {'name':'*','func':'COUNT'},
@@ -111,6 +132,7 @@ class TestParser(unittest.TestCase):
         result = parse("select * from blog order by age desc,name;")
         expected = {
             'type':'SELECT',
+            'distinct': 'N',
             'column':[{'name':'*','func':''}],
             'table':'blog',
             'where':[],
@@ -125,6 +147,7 @@ class TestParser(unittest.TestCase):
         result = parse("select * from blog limit 100;")
         expected = {
             'type':'SELECT',
+            'distinct': 'N',
             'column':[{'name':'*','func':''}],
             'table':'blog',
             'where':[],

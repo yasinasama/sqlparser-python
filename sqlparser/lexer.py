@@ -4,6 +4,7 @@ from .exceptions import LexerException
 
 reserved = {
     'select': 'SELECT',
+    'distinct':'DISTINCT',
     'from'  : 'FROM',
     'where' : 'WHERE',
     'group' : 'GROUP',
