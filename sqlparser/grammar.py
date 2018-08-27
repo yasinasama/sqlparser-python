@@ -41,19 +41,51 @@ def p_dml(p):
 ############         select            ############
 ###################################################
 def p_select(p):
-    """ select : SELECT columns FROM STRING where group_by having order_by limit
+    """ select : SELECT columns FROM table join where group_by having order_by limit
     """
     p[0] = {
         'type'  : p[1],
         'column': p[2],
         'table' : p[4],
-        'where' : p[5],
-        'group' : p[6],
-        'having': p[7],
-        'order' : p[8],
-        'limit' : p[9]
+        'join'  : p[5],
+        'where' : p[6],
+        'group' : p[7],
+        'having': p[8],
+        'order' : p[9],
+        'limit' : p[10]
     }
 
+def p_table(p):
+    """ table : table COMMA table
+              | STRING AS STRING
+              | STRING STRING
+              | STRING
+    """
+    if ',' in p:
+        p[0] = p[1] + p[3]
+    else:
+        if len(p) == 2:
+            p[0] = [{'value':p[1]}]
+        if len(p) == 3:
+            p[0] = [{'value':p[1],'name':p[2]}]
+        if len(p) == 4:
+            p[0] = [{'value':p[1],'name':p[3]}]
+
+def p_join(p):
+    """ join : INNER JOIN table on
+             | LEFT JOIN table on
+             | RIGHT JOIN table on
+             | FULL JOIN table on
+             | empty
+    """
+    p[0] = []
+    if len(p) > 2:
+        p[0] = {'type':p[1],'value':p[3]}
+
+def p_on(p):
+    """ on : ON item "=" item
+    """
+    p[0] = [p[2],p[4]]
 
 def p_where(p):
     """ where : WHERE conditions
@@ -123,12 +155,24 @@ def p_order_type(p):
 # p[0] => [x,x..] | [x]
 def p_columns(p):
     """ columns : columns COMMA columns
+                | column_as
                 | column
     """
+
     if len(p) > 2:
         p[0] = p[1] + p[3]
     else:
         p[0] = [p[1]]
+
+def p_column_as(p):
+    """ column_as : column AS item
+                  | column item
+    """
+    p[0] = p[1]
+    if len(p) > 3:
+        p[0]['name'] = p[3]
+    else:
+        p[0]['name'] = p[2]
 
 def p_column(p):
     """ column : function "(" distinct_item ")"
@@ -163,8 +207,12 @@ def p_item(p):
     """ item : string
              | NUMBER
              | "*"
+             | string "." item
     """
-    p[0] = p[1]
+    if len(p)>2:
+        p[0] = p[1]+'.'+p[3]
+    else:
+        p[0] = p[1]
 
 
 # p[0] => [1,2] | [1]

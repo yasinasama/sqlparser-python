@@ -7,6 +7,12 @@ reserved = {
     'distinct':'DISTINCT',
     'from'  : 'FROM',
     'where' : 'WHERE',
+    'inner' : 'INNER',
+    'left'  : 'LEFT',
+    'right' : 'RIGHT',
+    'full'  : 'FULL',
+    'join'  : 'JOIN',
+    'on'    : 'ON',
     'group' : 'GROUP',
     'by'    : 'BY',
     'having': 'HAVING',
@@ -64,7 +70,7 @@ def t_STRING(t):
     return t
 
 def t_QSTRING(t):
-    r"('[^\']*')|(\"[^\"]*\")"
+    r"('[^']*')|(\"[^\"]*\")|(`[^`]*`)"
     t.value = t.value[1:-1]
     return t
 
