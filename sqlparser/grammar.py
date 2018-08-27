@@ -41,28 +41,19 @@ def p_dml(p):
 ############         select            ############
 ###################################################
 def p_select(p):
-    """ select : SELECT distinct columns FROM STRING where group_by having order_by limit
+    """ select : SELECT columns FROM STRING where group_by having order_by limit
     """
     p[0] = {
         'type'  : p[1],
-        'distinct': p[2],
-        'column': p[3],
-        'table' : p[5],
-        'where' : p[6],
-        'group' : p[7],
-        'having': p[8],
-        'order' : p[9],
-        'limit' : p[10]
+        'column': p[2],
+        'table' : p[4],
+        'where' : p[5],
+        'group' : p[6],
+        'having': p[7],
+        'order' : p[8],
+        'limit' : p[9]
     }
 
-def p_distinct(p):
-    """ distinct : DISTINCT
-                 | empty
-    """
-    if 'DISTINCT' in p:
-        p[0] = 'Y'
-    else:
-        p[0] = 'N'
 
 def p_where(p):
     """ where : WHERE conditions
@@ -125,10 +116,13 @@ def p_order_type(p):
         p[0] = 'ASC'
 
 
+
+###################################################
+############         column            ############
+###################################################
 # p[0] => [x,x..] | [x]
 def p_columns(p):
     """ columns : columns COMMA columns
-                | DISTINCT column
                 | column
     """
     if len(p) > 2:
@@ -137,21 +131,36 @@ def p_columns(p):
         p[0] = [p[1]]
 
 def p_column(p):
-    """ column : COUNT "(" item ")"
-               | SUM "(" STRING ")"
-               | AVG "(" STRING ")"
-               | MIN "(" STRING ")"
-               | MAX "(" STRING ")"
+    """ column : function "(" distinct_item ")"
+               | function "(" item ")"
+               | distinct_item
                | item
     """
-    p[0] = {'name' : p[1],'func' : ''}
     if len(p) > 2:
-        p[0]['name'] = p[3]
-        p[0]['func'] = p[1]
+        p[0] = {'value' : {p[1]:p[3]}}
+    else:
+        p[0] = {'value':p[1]}
+
+def p_distinct_item(p):
+    """ distinct_item : DISTINCT item
+                      | DISTINCT "(" item ")"
+    """
+    if len(p) > 3:
+        p[0] = {p[1]:p[3]}
+    else:
+        p[0] = {p[1]:p[2]}
+
+def p_function(p):
+    """ function : COUNT
+                 | SUM
+                 | AVG
+                 | MIN
+                 | MAX
+    """
+    p[0] = p[1]
 
 def p_item(p):
-    """ item : QSTRING
-             | STRING
+    """ item : string
              | NUMBER
              | "*"
     """
