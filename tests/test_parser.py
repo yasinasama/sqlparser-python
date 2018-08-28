@@ -298,6 +298,32 @@ class TestParser(unittest.TestCase):
         }
         self.assertEqual(result,expected)
 
+    def test_create(self):
+        result = parse("create table blog (name varchar(30),age int);")
+        expected = {
+            'type':'CREATE',
+            'table': 'blog',
+            'columns' : [{'name': 'name','type':'VARCHAR(30)'},
+                         {'name': 'age','type':'INT'}]
+        }
+        self.assertEqual(result,expected)
+
+    def test_drop(self):
+        result = parse("drop table blog;")
+        expected = {
+            'type':'DROP',
+            'table': 'blog'
+        }
+        self.assertEqual(result,expected)
+
+    def test_alter(self):
+        result = parse("alter table blog add tag varchar(5);")
+        expected = {
+            'type':'ALTER',
+            'table': 'blog',
+            'columns': {'ADD':{'name':'tag','type':'VARCHAR(5)'}}
+        }
+        self.assertEqual(result,expected)
 
 
 if __name__=='__main__':

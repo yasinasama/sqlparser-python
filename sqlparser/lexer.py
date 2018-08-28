@@ -44,7 +44,20 @@ reserved = {
     'sum'   : 'SUM',
     'avg'   : 'AVG',
     'min'   : 'MIN',
-    'max'   : 'MAX'
+    'max'   : 'MAX',
+    'int'   : 'INT',
+    'integer':'INTEGER',
+    'smallint':'SMALLINT',
+    'tinyint':'TINYINT',
+    'mediumint':'MEDIUMINT',
+    'bigint': 'BIGINT',
+    'float':'FLOAT',
+    'double':'DOUBLE',
+    'decimal': 'DECIMAL',
+    'char'  :'CHAR',
+    'varchar' : 'VARCHAR',
+    'add'  : 'ADD',
+    'column':'COLUMN'
 }
 
 tokens = (

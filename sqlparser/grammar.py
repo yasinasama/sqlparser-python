@@ -5,16 +5,12 @@ from ply import lex,yacc
 from . import lexer
 from .exceptions import GrammarException
 
+
 def p_expression(p):
     """ expression : dml END
+                   | ddl END
     """
     p[0] = p[1]
-
-# def p_expression(p):
-#     """ expression : dml END
-#                    | ddl END
-#     """
-#     p[0] = p[1]
 
 def p_dml(p):
     """ dml : select
@@ -24,12 +20,13 @@ def p_dml(p):
     """
     p[0] = p[1]
 
-# def p_ddl(p):
-#     """ ddl : create
-#             | alter
-#             | drop
-#     """
-#     p[0] = p[1]
+
+def p_ddl(p):
+    """ ddl : create
+            | alter
+            | drop
+    """
+    p[0] = p[1]
 
 
 ###################################################
@@ -227,6 +224,80 @@ def p_delete(p):
         'where': p[4]
     }
 
+###################################################
+############         create            ############
+###################################################
+def p_create(p):
+    """ create : CREATE TABLE string "(" create_columns ")"
+    """
+    p[0] = {
+        'type': p[1],
+        'table': p[3],
+        'columns': p[5]
+    }
+
+
+def p_create_columns(p):
+    """ create_columns : create_columns COMMA create_columns
+                       | string datatype
+    """
+    if len(p) > 3:
+        p[0] = p[1] + p[3]
+    else:
+        p[0] = [{'name':p[1],'type':p[2]}]
+
+def p_datatype(p):
+    """ datatype : INT
+                 | INTEGER
+                 | TINYINT
+                 | SMALLINT
+                 | MEDIUMINT
+                 | BIGINT
+                 | FLOAT
+                 | DOUBLE
+                 | DECIMAL
+                 | CHAR "(" NUMBER ")"
+                 | VARCHAR "(" NUMBER ")"
+    """
+    if len(p) > 2:
+        p[0] = '%s(%s)'%(p[1],p[3])
+    else:
+        p[0] = p[1]
+
+###################################################
+############         alter              ###########
+###################################################
+def p_alter(p):
+    """ alter : ALTER TABLE string change_column
+    """
+    p[0] = {
+        'type': p[1],
+        'table': p[3],
+        'columns': p[4]
+    }
+
+def p_change_column(p):
+    """ change_column : ADD string datatype
+                      | DROP COLUMN string
+                      | ALTER COLUMN string datatype
+    """
+    if p[1] == 'ADD':
+        p[0] = {'ADD':{'name':p[2],'type':p[3]}}
+    if p[1] == 'DROP':
+        p[0] = {'DROP': {'name': p[2]}}
+    if p[1] == 'ALTER':
+        p[0] = {'ALTER': {'name': p[3],'type':p[4]}}
+
+###################################################
+############         drop              ############
+###################################################
+def p_drop(p):
+    """ drop : DROP TABLE string
+    """
+    p[0] = {
+        'type': p[1],
+        'table': p[3]
+    }
 
 ###################################################
 ############         column            ############
