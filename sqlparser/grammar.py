@@ -71,19 +71,23 @@ def p_table(p):
         if len(p) == 4:
             p[0] = [{'value':p[1],'name':p[3]}]
 
+
 def p_join(p):
-    """ join : INNER JOIN table on
-             | LEFT JOIN table on
-             | RIGHT JOIN table on
-             | FULL JOIN table on
+    """ join : INNER JOIN table on join
+             | LEFT JOIN table on join
+             | RIGHT JOIN table on join
+             | FULL JOIN table on join
+             | JOIN table on join
              | empty
     """
     p[0] = []
-    if len(p) > 2:
-        p[0] = {'type':p[1],'value':p[3]}
+    if len(p) == 5:
+        p[0] = [{'type':'INNER','table':p[2],'on':p[3]}]+p[4]
+    if len(p) == 6:
+        p[0] = [{'type':p[1],'table':p[3],'on':p[4]}]+p[5]
 
 def p_on(p):
-    """ on : ON item "=" item
+    """ on : ON item COMPARISON item
     """
     p[0] = [p[2],p[4]]
 

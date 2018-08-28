@@ -121,13 +121,29 @@ class TestParser(unittest.TestCase):
         self.assertEqual(result,expected)
 
     def test_left_join(self):
-        result = parse("select * from blog left join user on blog.name = user.name;")
+        result = parse("select * from blog b left join user u on b.name = u.name;")
         expected = {
             'type':'SELECT',
             'column':[{'value':'*'}],
-            'table':[{'value':'blog'}],
-            'join': [{'type':'LEFT','value':['blog.name','user.name']}],
-            'where':[{'left': {'value': 'name'}, 'right': 'zhangsan', 'compare': '='}],
+            'table':[{'value':'blog','name':'b'}],
+            'join': [{'type':'LEFT','table':[{'value':'user','name':'u'}],'on':['b.name','u.name']}],
+            'where':[],
+            'group':[],
+            'having':[],
+            'order':[],
+            'limit':[]
+        }
+        self.assertEqual(result,expected)
+
+    def test_join(self):
+        result = parse("select * from blog b JOIN user u on b.name = u.name join tags t on b.tag=t.tag;")
+        expected = {
+            'type':'SELECT',
+            'column':[{'value':'*'}],
+            'table':[{'value':'blog','name':'b'}],
+            'join': [{'type':'INNER','table':[{'value':'user','name':'u'}],'on':['b.name','u.name']},
+                     {'type': 'INNER', 'table': [{'value': 'tags', 'name': 't'}], 'on': ['b.tag', 't.tag']}],
+            'where':[],
             'group':[],
             'having':[],
             'order':[],
