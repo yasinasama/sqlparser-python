@@ -18,16 +18,11 @@ def p_expression(p):
 
 def p_dml(p):
     """ dml : select
+            | update
+            | insert
+            | delete
     """
     p[0] = p[1]
-
-# def p_dml(p):
-#     """ dml : select
-#             | update
-#             | insert
-#             | delete
-#     """
-#     p[0] = p[1]
 
 # def p_ddl(p):
 #     """ ddl : create
@@ -65,11 +60,11 @@ def p_table(p):
         p[0] = p[1] + p[3]
     else:
         if len(p) == 2:
-            p[0] = [{'value':p[1]}]
+            p[0] = [{'name':p[1]}]
         if len(p) == 3:
-            p[0] = [{'value':p[1],'name':p[2]}]
+            p[0] = [{'name':p[1],'alias':p[2]}]
         if len(p) == 4:
-            p[0] = [{'value':p[1],'name':p[3]}]
+            p[0] = [{'name':p[1],'alias':p[3]}]
 
 
 def p_join(p):
@@ -152,6 +147,86 @@ def p_order_type(p):
         p[0] = 'ASC'
 
 
+###################################################
+############         update            ############
+###################################################
+def p_update(p):
+    """ update : UPDATE table SET set where
+    """
+    p[0] = {
+        'type'  : p[1],
+        'table': p[2],
+        'column'  : p[4],
+        'where' : p[5]
+    }
+
+def p_set(p):
+    """ set : set COMMA set
+            | item COMPARISON item
+    """
+    if '=' in p:
+        p[0] = [{'name':p[1],'value':p[3]}]
+    else:
+        p[0] = p[1] + p[3]
+
+###################################################
+############         insert            ############
+###################################################
+def p_insert(p):
+    """ insert : INSERT into table insert_columns VALUES values
+    """
+    p[0] = {
+        'type': p[1],
+        'table': p[3],
+        'columns': p[4],
+        'values': p[6]
+    }
+
+def p_into(p):
+    """ into : INTO
+             | empty
+    """
+    pass
+
+def p_insert_columns(p):
+    """ insert_columns : "(" columns ")"
+                       | empty
+    """
+    p[0] = []
+    if len(p) > 2:
+        p[0] = p[2]
+
+def p_value(p):
+    """ value : value COMMA value
+              | string
+              | NUMBER
+    """
+    if len(p) > 2:
+        p[0] = p[1] + p[3]
+    else:
+        p[0] = [p[1]]
+
+def p_values(p):
+    """ values : values COMMA values
+               | "(" value ")"
+    """
+    if ',' in p:
+        p[0] = p[1] + p[3]
+    else:
+        p[0] = [p[2]]
+
+###################################################
+############         delete            ############
+###################################################
+def p_delete(p):
+    """ delete : DELETE FROM table where
+    """
+    p[0] = {
+        'type': p[1],
+        'table': p[3],
+        'where': p[4]
+    }
+
 
 ###################################################
 ############         column            ############
@@ -174,9 +249,9 @@ def p_column_as(p):
     """
     p[0] = p[1]
     if len(p) > 3:
-        p[0]['name'] = p[3]
+        p[0]['alias'] = p[3]
     else:
-        p[0]['name'] = p[2]
+        p[0]['alias'] = p[2]
 
 def p_column(p):
     """ column : function "(" distinct_item ")"
@@ -185,9 +260,9 @@ def p_column(p):
                | item
     """
     if len(p) > 2:
-        p[0] = {'value' : {p[1]:p[3]}}
+        p[0] = {'name': {p[1]:p[3]}}
     else:
-        p[0] = {'value':p[1]}
+        p[0] = {'name':p[1]}
 
 def p_distinct_item(p):
     """ distinct_item : DISTINCT item
@@ -265,8 +340,8 @@ def p_compare(p):
                 | column LIKE QSTRING
     """
     p[0] = {
-        'left' : p[1],
-        'right': p[3],
+        'name' : p[1]['name'],
+        'value': p[3],
         'compare' : p[2]
     }
 

@@ -10,8 +10,8 @@ class TestParser(unittest.TestCase):
         result = parse("select * from blog;")
         expected = {
             'type':'SELECT',
-            'column':[{'value':'*'}],
-            'table':[{'value':'blog'}],
+            'column':[{'name':'*'}],
+            'table':[{'name':'blog'}],
             'join':[],
             'where':[],
             'group':[],
@@ -25,8 +25,8 @@ class TestParser(unittest.TestCase):
         result = parse("select count(*) as cnt from blog;")
         expected = {
             'type':'SELECT',
-            'column':[{'value':{'COUNT':'*'},'name':'cnt'}],
-            'table':[{'value':'blog'}],
+            'column':[{'name':{'COUNT':'*'},'alias':'cnt'}],
+            'table':[{'name':'blog'}],
             'join': [],
             'where':[],
             'group':[],
@@ -40,8 +40,8 @@ class TestParser(unittest.TestCase):
         result = parse("select distinct name from blog;")
         expected = {
             'type':'SELECT',
-            'column':[{'value':{'DISTINCT':'name'}}],
-            'table':[{'value':'blog'}],
+            'column':[{'name':{'DISTINCT':'name'}}],
+            'table':[{'name':'blog'}],
             'join': [],
             'where':[],
             'group':[],
@@ -55,8 +55,8 @@ class TestParser(unittest.TestCase):
         result = parse("select avg(distinct(name)) from blog;")
         expected = {
             'type':'SELECT',
-            'column':[{'value':{'AVG':{'DISTINCT':'name'}}}],
-            'table':[{'value':'blog'}],
+            'column':[{'name':{'AVG':{'DISTINCT':'name'}}}],
+            'table':[{'name':'blog'}],
             'join': [],
             'where':[],
             'group':[],
@@ -70,8 +70,9 @@ class TestParser(unittest.TestCase):
         result = parse("select b.name as name,b.age as age from blog b;")
         expected = {
             'type':'SELECT',
-            'column':[{'value':'b.name','name':'name'},{'value':'b.age','name':'age'}],
-            'table':[{'value':'blog','name':'b'}],
+            'column':[{'name':'b.name','alias':'name'},
+                      {'name':'b.age','alias':'age'}],
+            'table':[{'name':'blog','alias':'b'}],
             'join': [],
             'where':[],
             'group':[],
@@ -85,10 +86,10 @@ class TestParser(unittest.TestCase):
         result = parse("select * from blog where name='zhangsan';")
         expected = {
             'type':'SELECT',
-            'column':[{'value':'*'}],
-            'table':[{'value':'blog'}],
+            'column':[{'name':'*'}],
+            'table':[{'name':'blog'}],
             'join': [],
-            'where':[{'left': {'value': 'name'}, 'right': 'zhangsan', 'compare': '='}],
+            'where':[{'name': 'name', 'value': 'zhangsan', 'compare': '='}],
             'group':[],
             'having':[],
             'order':[],
@@ -100,17 +101,17 @@ class TestParser(unittest.TestCase):
         result = parse("select * from blog where name='zhangsan' and (age<18 or age>30);")
         expected = {
             'type':'SELECT',
-            'column':[{'value':'*'}],
-            'table':[{'value':'blog'}],
+            'column':[{'name':'*'}],
+            'table':[{'name':'blog'}],
             'join': [],
             'where':
             [
-                {'left': {'value': 'name'}, 'right': 'zhangsan', 'compare': '='},
+                {'name': 'name', 'value': 'zhangsan', 'compare': '='},
                 'AND',
                 [
-                    {'left':{'value':'age'},'right':18,'compare':'<'},
+                    {'name':'age','value':18,'compare':'<'},
                     'OR',
-                    {'left': {'value': 'age'}, 'right': 30, 'compare': '>'}
+                    {'name': 'age', 'value': 30, 'compare': '>'}
                 ]
             ],
             'group':[],
@@ -124,9 +125,9 @@ class TestParser(unittest.TestCase):
         result = parse("select * from blog b left join user u on b.name = u.name;")
         expected = {
             'type':'SELECT',
-            'column':[{'value':'*'}],
-            'table':[{'value':'blog','name':'b'}],
-            'join': [{'type':'LEFT','table':[{'value':'user','name':'u'}],'on':['b.name','u.name']}],
+            'column':[{'name':'*'}],
+            'table':[{'name':'blog','alias':'b'}],
+            'join': [{'type':'LEFT','table':[{'name':'user','alias':'u'}],'on':['b.name','u.name']}],
             'where':[],
             'group':[],
             'having':[],
@@ -139,10 +140,10 @@ class TestParser(unittest.TestCase):
         result = parse("select * from blog b JOIN user u on b.name = u.name join tags t on b.tag=t.tag;")
         expected = {
             'type':'SELECT',
-            'column':[{'value':'*'}],
-            'table':[{'value':'blog','name':'b'}],
-            'join': [{'type':'INNER','table':[{'value':'user','name':'u'}],'on':['b.name','u.name']},
-                     {'type': 'INNER', 'table': [{'value': 'tags', 'name': 't'}], 'on': ['b.tag', 't.tag']}],
+            'column':[{'name':'*'}],
+            'table':[{'name':'blog','alias':'b'}],
+            'join': [{'type':'INNER','table':[{'name':'user','alias':'u'}],'on':['b.name','u.name']},
+                     {'type': 'INNER', 'table': [{'name': 'tags', 'alias': 't'}], 'on': ['b.tag', 't.tag']}],
             'where':[],
             'group':[],
             'having':[],
@@ -155,12 +156,12 @@ class TestParser(unittest.TestCase):
         result = parse("select * from blog where name like '%张%';")
         expected = {
             'type':'SELECT',
-            'column':[{'value':'*'}],
-            'table':[{'value':'blog'}],
+            'column':[{'name':'*'}],
+            'table':[{'name':'blog'}],
             'join': [],
             'where':
             [
-                {'left': {'value': 'name'}, 'right': '%张%', 'compare': 'LIKE'},
+                {'name': 'name', 'value': '%张%', 'compare': 'LIKE'},
             ],
             'group':[],
             'having':[],
@@ -173,10 +174,10 @@ class TestParser(unittest.TestCase):
         result = parse("select name,age,count(*) from blog group by name,age;")
         expected = {
             'type':'SELECT',
-            'column':[{'value':'name'},
-                      {'value':'age'},
-                      {'value':{'COUNT':'*'}}],
-            'table':[{'value':'blog'}],
+            'column':[{'name':'name'},
+                      {'name':'age'},
+                      {'name':{'COUNT':'*'}}],
+            'table':[{'name':'blog'}],
             'join': [],
             'where':[],
             'group':['name','age'],
@@ -190,10 +191,11 @@ class TestParser(unittest.TestCase):
         result = parse("select blog.name,blog.age,count(u.*) from blog as b,username as u;")
         expected = {
             'type':'SELECT',
-            'column':[{'value':'blog.name'},
-                      {'value':'blog.age'},
-                      {'value':{'COUNT':'u.*'}}],
-            'table':[{'value':'blog','name':'b'},{'value':'username','name':'u'}],
+            'column':[{'name':'blog.name'},
+                      {'name':'blog.age'},
+                      {'name':{'COUNT':'u.*'}}],
+            'table':[{'name':'blog','alias':'b'},
+                     {'name':'username','alias':'u'}],
             'join': [],
             'where':[],
             'group':[],
@@ -207,17 +209,17 @@ class TestParser(unittest.TestCase):
         result = parse("select name,age,count(*),avg(age) from blog group by name,age having count(*)>2 and avg(age)<20;")
         expected = {
             'type':'SELECT',
-            'column':[{'value':'name'},
-                      {'value':'age'},
-                      {'value': {'COUNT': '*'}},
-                      {'value':{'AVG':'age'}}],
-            'table':[{'value':'blog'}],
+            'column':[{'name':'name'},
+                      {'name':'age'},
+                      {'name': {'COUNT': '*'}},
+                      {'name':{'AVG':'age'}}],
+            'table':[{'name':'blog'}],
             'join': [],
             'where':[],
             'group':['name','age'],
-            'having':[{'left': {'value': {'COUNT':'*'}}, 'right': 2, 'compare': '>'},
+            'having':[{'name': {'COUNT':'*'}, 'value': 2, 'compare': '>'},
                       'AND',
-                      {'left': {'value': {'AVG':'age'}}, 'right': 20, 'compare': '<'}],
+                      {'name': {'AVG':'age'}, 'value': 20, 'compare': '<'}],
             'order':[],
             'limit':[]
         }
@@ -227,13 +229,14 @@ class TestParser(unittest.TestCase):
         result = parse("select * from blog order by age desc,name;")
         expected = {
             'type':'SELECT',
-            'column':[{'value':'*'}],
-            'table':[{'value':'blog'}],
+            'column':[{'name':'*'}],
+            'table':[{'name':'blog'}],
             'join': [],
             'where':[],
             'group':[],
             'having':[],
-            'order':[{'name':'age','type':'DESC'},{'name':'name','type':'ASC'}],
+            'order':[{'name':'age','type':'DESC'},
+                     {'name':'name','type':'ASC'}],
             'limit':[]
         }
         self.assertEqual(result,expected)
@@ -242,14 +245,56 @@ class TestParser(unittest.TestCase):
         result = parse("select * from blog limit 100;")
         expected = {
             'type':'SELECT',
-            'column':[{'value':'*'}],
-            'table':[{'value':'blog'}],
+            'column':[{'name':'*'}],
+            'table':[{'name':'blog'}],
             'join': [],
             'where':[],
             'group':[],
             'having':[],
             'order':[],
             'limit':[0,100]
+        }
+        self.assertEqual(result,expected)
+
+    def test_update(self):
+        result = parse("update blog set name=cc where name=dd;")
+        expected = {
+            'type':'UPDATE',
+            'table': [{'name':'blog'}],
+            'column'  : [{'name':'name','value':'cc'}],
+            'where' : [{'name': 'name', 'value': 'dd','compare': '='}]
+        }
+        self.assertEqual(result,expected)
+
+    def test_update_2(self):
+        result = parse("update blog set name=cc,age=18 where name=dd;")
+        expected = {
+            'type':'UPDATE',
+            'table': [{'name':'blog'}],
+            'column'  : [{'name':'name','value':'cc'},
+                         {'name':'age','value':18}],
+            'where' : [{'name': 'name', 'value': 'dd','compare': '='}]
+        }
+        self.assertEqual(result,expected)
+
+    def test_delete(self):
+        result = parse("delete from blog where name=dd;")
+        expected = {
+            'type':'DELETE',
+            'table': [{'name':'blog'}],
+            'where' : [{'name': 'name', 'value': 'dd','compare': '='}]
+        }
+        self.assertEqual(result,expected)
+
+    def test_insert(self):
+        result = parse("insert into blog (name,age) values (cc,18),('dd',2);")
+        expected = {
+            'type':'INSERT',
+            'table': [{'name':'blog'}],
+            'columns' : [{'name': 'name'},
+                         {'name': 'age'}],
+            'values' : [['cc',18],
+                        ['dd',2]]
         }
         self.assertEqual(result,expected)
 
