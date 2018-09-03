@@ -429,7 +429,7 @@ def p_error(p):
 
 tokens = lexer.tokens
 
-DEBUG = True
+DEBUG = False
 
 L = lex.lex(module=lexer, optimize=False, debug=DEBUG)
 P = yacc.yacc(debug=DEBUG)

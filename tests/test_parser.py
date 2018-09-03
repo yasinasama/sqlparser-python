@@ -37,10 +37,11 @@ class TestParser(unittest.TestCase):
         self.assertEqual(result,expected)
 
     def test_distinct(self):
-        result = parse("select distinct name from blog;")
+        result = parse("select distinct name,age from blog;")
         expected = {
             'type':'SELECT',
-            'column':[{'name':{'DISTINCT':'name'}}],
+            'column':[{'name':{'DISTINCT':'name'}},
+                      {'name': 'age'}],
             'table':[{'name':'blog'}],
             'join': [],
             'where':[],
