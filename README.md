@@ -4,10 +4,10 @@
 ```
 git clone https://github.com/yasinasama/sqlparser-python.git
 cd sqlparser
-python setup install
+python setup.py install
 ```
 </br>
-```python
+```
 >> from sqlparser import parse
 >> parse('select a from b where c=1 group by a')
 'type':'SELECT',
@@ -19,4 +19,5 @@ python setup install
 'having':[],
 'order':[],
 'limit':[]
+
 ```
