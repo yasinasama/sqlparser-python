@@ -10,7 +10,6 @@ python setup.py install
 ```
 from sqlparser import parse
 parse("select * from blog where name='zhangsan';")
-
 'type':'SELECT',
 'column':[{'name':'*'}],
 'table':[{'name':'blog'}],
@@ -20,5 +19,4 @@ parse("select * from blog where name='zhangsan';")
 'having':[],
 'order':[],
 'limit':[]
-
 ```
