@@ -8,8 +8,9 @@ python setup.py install
 ```
 </br>
 ```
->> from sqlparser import parse
->> parse('select a from b where c=1 group by a')
+from sqlparser import parse
+parse("select * from blog where name='zhangsan';")
+
 'type':'SELECT',
 'column':[{'name':'*'}],
 'table':[{'name':'blog'}],
