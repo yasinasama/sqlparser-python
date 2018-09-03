@@ -409,16 +409,24 @@ def p_conditions(p):
 def p_compare(p):
     """ compare : column COMPARISON item
                 | column LIKE QSTRING
+                | column BETWEEN item AND item
     """
-    p[0] = {
-        'name' : p[1]['name'],
-        'value': p[3],
-        'compare' : p[2]
-    }
+    if len(p) == 4:
+        p[0] = {
+            'name' : p[1]['name'],
+            'value': p[3],
+            'compare' : p[2]
+        }
+    if len(p) == 6:
+        p[0] = {
+            'name': p[1]['name'],
+            'value': [p[3],p[5]],
+            'compare': p[2]
+        }
 
 
 # empty return None
-# so expression like (t : empty) => len()==2
+# so expression like (t : empty) => len(p)==2
 def p_empty(p):
     """empty :"""
     pass

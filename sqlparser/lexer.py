@@ -46,17 +46,17 @@ reserved = {
     'min'   : 'MIN',
     'max'   : 'MAX',
     'int'   : 'INT',
-    'integer':'INTEGER',
+    'integer' :'INTEGER',
     'smallint':'SMALLINT',
-    'tinyint':'TINYINT',
+    'tinyint' :'TINYINT',
     'mediumint':'MEDIUMINT',
-    'bigint': 'BIGINT',
-    'float':'FLOAT',
+    'bigint'  : 'BIGINT',
+    'float' :'FLOAT',
     'double':'DOUBLE',
     'decimal': 'DECIMAL',
     'char'  :'CHAR',
-    'varchar' : 'VARCHAR',
-    'add'  : 'ADD',
+    'varchar': 'VARCHAR',
+    'add'   : 'ADD',
     'column':'COLUMN'
 }
 
