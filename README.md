@@ -9,15 +9,18 @@ python setup.py install
 
 ## demo
 ````
-from sqlparser import parse
-parse("select * from blog where name='zhangsan';")
-'type':'SELECT',
-'column':[{'name':'*'}],
-'table':[{'name':'blog'}],
-'join': [],
-'where':[{'name': 'name', 'value': 'zhangsan', 'compare': '='}],
-'group':[],
-'having':[],
-'order':[],
-'limit':[]
+>>from sqlparser import parse
+>>parse("select * from blog where name='zhangsan';")
+
+{
+    'type':'SELECT',
+    'column':[{'name':'*'}],
+    'table':[{'name':'blog'}],
+    'join': [],
+    'where':[{'name': 'name', 'value': 'zhangsan', 'compare': '='}],
+    'group':[],
+    'having':[],
+    'order':[],
+    'limit':[]
+}
 ````

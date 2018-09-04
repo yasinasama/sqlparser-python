@@ -410,6 +410,7 @@ def p_compare(p):
     """ compare : column COMPARISON item
                 | column LIKE QSTRING
                 | column BETWEEN item AND item
+                | column IS null
     """
     if len(p) == 4:
         p[0] = {
@@ -424,6 +425,14 @@ def p_compare(p):
             'compare': p[2]
         }
 
+def p_null(p):
+    """ null : NULL
+             | NOT NULL
+    """
+    if len(p) == 2:
+        p[0] = 'NULL'
+    else:
+        p[0] = 'NOT NULL'
 
 # empty return None
 # so expression like (t : empty) => len(p)==2
