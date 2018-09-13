@@ -367,13 +367,13 @@ def p_item(p):
 
 # p[0] => [1,2] | [1]
 def p_numbers(p):
-    """ numbers : NUMBER COMMA NUMBER
+    """ numbers : numbers COMMA numbers
                 | NUMBER
     """
     if len(p) > 2:
-        p[0] = [p[1], p[3]]
+        p[0] = p[1] + p[3]
     else:
-        p[0] = [0, p[1]]
+        p[0] = [p[1]]
 
 def p_strings(p):
     """ strings : strings COMMA strings
@@ -383,6 +383,12 @@ def p_strings(p):
         p[0] = p[1] + p[3]
     else:
         p[0] = [p[1]]
+
+def p_items(p):
+    """ items : strings
+              | numbers
+    """
+    p[0] = p[1]
 
 
 def p_string(p):
@@ -408,9 +414,10 @@ def p_conditions(p):
 
 def p_compare(p):
     """ compare : column COMPARISON item
-                | column LIKE QSTRING
+                | column like QSTRING
                 | column BETWEEN item AND item
                 | column IS null
+                | column in lritems
     """
     if len(p) == 4:
         p[0] = {
@@ -424,6 +431,29 @@ def p_compare(p):
             'value': [p[3],p[5]],
             'compare': p[2]
         }
+
+def p_lritems(p):
+    """ lritems : "(" items ")"
+    """
+    p[0] = p[2]
+
+def p_like(p):
+    """ like : LIKE
+             | NOT LIKE
+    """
+    if len(p) == 2:
+        p[0] = 'LIKE'
+    else:
+        p[0] = 'NOT LIKE'
+
+def p_in(p):
+    """ in : IN
+           | NOT IN
+    """
+    if len(p) == 2:
+        p[0] = 'IN'
+    else:
+        p[0] = 'NOT IN'
 
 def p_null(p):
     """ null : NULL

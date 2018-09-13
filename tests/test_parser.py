@@ -137,6 +137,21 @@ class TestParser(unittest.TestCase):
         }
         self.assertEqual(result,expected)
 
+    def test_where_4(self):
+        result = parse("select * from blog where age not in (13,12,11);")
+        expected = {
+            'type':'SELECT',
+            'column':[{'name':'*'}],
+            'table':[{'name':'blog'}],
+            'join': [],
+            'where':[{'name': 'age', 'value': [13,12,11], 'compare': 'NOT IN'}],
+            'group':[],
+            'having':[],
+            'order':[],
+            'limit':[]
+        }
+        self.assertEqual(result,expected)
+
     def test_left_join(self):
         result = parse("select * from blog b left join user u on b.name = u.name;")
         expected = {
