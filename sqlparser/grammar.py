@@ -122,6 +122,8 @@ def p_limit(p):
     """
     p[0] = []
     if len(p) > 2:
+        if len(p[2]) == 1:
+            p[2] = [0] + p[2]
         p[0] = p[2]
 
 def p_order(p):
